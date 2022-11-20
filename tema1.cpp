@@ -78,11 +78,11 @@ bool binarySearch(int lp, int rp, int value, int exp) {
     }
     int mid = (lp + rp) / 2;
     if (value < pow(mid, exp)) {
-        return binarySearch(lp, mid, value, exp);
+        return binarySearch(lp, mid - 1, value, exp);
     } else if (value > pow(mid, exp)) {
-        return binarySearch(mid, rp, value, exp);
+        return binarySearch(mid + 1, rp, value, exp);
     } else if (pow(mid, exp) == value) {
-            return true;
+        return true;
     }
     return false;
 }
@@ -101,12 +101,9 @@ vector<int> getExponents(int value, int exponents) {
         int lowerPower = index - 1;
         int leftPointer = pow(base, static_cast<float>(lowerPower) / i) - 1;
         int rightPointer = pow(base, static_cast<float>(higherPower) / i) + 1;
-        if (i < lowerPower) {
-            for (int j = pow(base, static_cast<float>(lowerPower) / i) - 1;
-                j < pow(base, static_cast<float>(higherPower) / i) + 1; j++) {
-                if (pow(j, i) == value) {
-                    v.push_back(i);
-                }
+        if (i <= lowerPower) {
+            if (binarySearch(leftPointer, rightPointer, value, i)) {
+                v.push_back(i);
             }
         } else if (value == 1) {
             v.push_back(i);
@@ -123,6 +120,7 @@ void* mapFunc(void* arg) {
         pthread_mutex_lock(&mutex);
         if (!mapper->getFiles()->empty()) {
             fileToProcess = mapper->getFiles()->front();
+            // delete popfile
             mapper->popFile();
         } else {
             break;
@@ -152,7 +150,6 @@ void* reduceFunc(void* arg) {
     vector<Mapper *> mappers = pair1.first;
     int noMappers = mappers[0]->getMax();
     pthread_barrier_wait(&barrier);
-    pthread_mutex_lock(&mutex);
     int toReduce = id - noMappers;
     unordered_set<int> toReturn;
     for (auto mapper : mappers) {
@@ -160,10 +157,10 @@ void* reduceFunc(void* arg) {
             toReturn.insert(value);
         }
     }
-    cout << "Size of power " << toReduce + 2 << endl;
-    cout << toReturn.size() << endl;
-    pthread_mutex_unlock(&mutex);
-
+    stringstream ss;
+    ss << "out" << (toReduce + 2) << ".txt";
+    ofstream fout(ss.str());
+    fout << toReturn.size();
     pthread_exit(NULL);
 }
 
@@ -182,7 +179,7 @@ int main(int argc, char *argv[]) {
     void *status;
     pthread_barrier_init(&barrier, NULL, NUM_THREADS);
     string filename = argv[3];
-    ifstream file(filename, ifstream::in);
+    ifstream file(filename);
     queue<string> filesToRead = {};
     map<string, long long> files;
     vector<Mapper *> mappers;
