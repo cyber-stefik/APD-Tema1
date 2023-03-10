@@ -212,25 +212,7 @@ int main(int argc, char *argv[]) {
 	  		printf("Eroare la asteptarea thread-ului %ld\n", id);
 	  		exit(-1);
 		}
-  	}
-
-    // cout << "Values from exponent 2 " << mappers[0]->values[0].size() << endl;
-    // for (auto it : mappers[0]->values[0]) {
-    //     cout << it << " ";
-    // }
-    // cout << "\nValues from exponent 3 " << mappers[0]->values[1].size() << endl;
-    // for (auto it : mappers[0]->values[1]) {
-    //     cout << it << " ";
-    // }
-    // cout << "\nValues from exponent 4 " << mappers[0]->values[2].size() << endl;
-    // for (auto it : mappers[0]->values[2]) {
-    //     cout << it << " ";
-    // }
-    // cout << "\nValues from exponent 5 " << mappers[0]->values[3].size() << endl;
-    // for (auto it : mappers[0]->values[3]) {
-    //     cout << it << " ";
-    // }
-    // cout << endl;
+	}
 
     pthread_mutex_destroy(&mutex);
     pthread_barrier_destroy(&barrier);
